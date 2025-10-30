@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Reconocimiento Facial{% endblock %}</title>
+  <link rel="icon" href="{% static 'img/favicon.png' %}" />
+
+  <!-- Tailwind CDN para desarrollo (rápido). Para producción, compílalo localmente. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tu CSS opcional -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="min-h-full bg-white text-gray-900 antialiased">
+  <!-- Header / Navbar -->
+  <header class="border-b border-gray-200">
+    <nav class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8" aria-label="principal">
+      <div class="flex h-16 items-center justify-between">
+        <a href="/" class="flex items-center gap-2 font-semibold tracking-tight hover:opacity-80">
+          <span class="text-lg">ReconFace</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <a href="/" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Inicio</a>
+          <a href="{% url 'reconocimiento' %}" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Reconocimiento</a>
+          {% block nav_extra %}{% endblock %}
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Flash messages -->
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-4">
+    {% if messages %}
+      <div class="space-y-2">
+        {% for message in messages %}
+          <div class="rounded-xl border {{ message.tags|default:'info' }} bg-gray-50 px-4 py-3 text-sm text-gray-700">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Main -->
+  <main class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
+    {% block page_header %}{% endblock %}
+    {% block content %}
+      <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <p class="text-sm text-gray-600">Contenido aquí…</p>
+      </section>
+    {% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-200">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-6 text-xs text-gray-500">
+      <p>&copy; {% now 'Y' %} ReconFace. Hecho para UNEMI.</p>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

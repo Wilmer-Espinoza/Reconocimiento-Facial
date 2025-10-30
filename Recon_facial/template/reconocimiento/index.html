@@ -1,0 +1,470 @@
+{% extends "base_template.html" %}
+{% block content %}
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 4px;
+    text-align: center;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    color: #86868b;
+    font-size: 14px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .main-layout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .video-section {
+    flex: 1;
+    min-width: 520px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .video-container {
+    position: relative;
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    aspect-ratio: 4/3;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  }
+
+  #stream {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .stream-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #86868b;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+  }
+
+  button {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: #0071e3;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #0077ed;
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: #f5f5f7;
+    color: #1d1d1f;
+  }
+
+  button:disabled {
+    background: #d2d2d7;
+    cursor: not-allowed;
+  }
+
+  #msg {
+    margin-top: 0.75rem;
+    color: #86868b;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .info-section {
+    flex: 0 0 300px;
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 16px);
+    max-height: 600px;
+  }
+
+  .detections-panel {
+    margin-bottom: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .detection-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  .detection-item {
+    padding: 10px;
+    background: #f5f5f7;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 16px;
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: #1d1d1f;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: #86868b;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e5e7;
+  }
+</style>
+
+<div class="container">
+  <h1>Control de Reconocimiento</h1>
+  <p class="subtitle">Sistema de detección facial automático</p>
+
+  <div class="main-layout">
+    <div class="video-section">
+      <div class="video-container">
+        <img id="stream" src="" alt="Stream de la cámara"/>
+        <div class="stream-placeholder"></div>
+      </div>
+      <div class="controls">
+        <button id="btn-recognize" class="btn-primary">Iniciar Cámara</button>
+        <button id="btn-stop" class="btn-secondary" style="display:none;">Detener</button>
+        <button id="btn-snapshot" class="btn-primary">Registrar Asistencia</button>
+      </div>
+      <p id="msg">Comprobando modelo...</p>
+    </div>
+
+    <div class="info-section">
+      <div class="detections-panel">
+        <h3>Asistencias de Hoy</h3>
+        <ul id="detection-list" class="detection-list">
+          <!-- Las asistencias se añadirán aquí -->
+        </ul>
+      </div>
+      
+      <div>
+        <h3>Cómo funciona</h3>
+        <ol>
+          <li>Pulsa <b>Iniciar reconocimiento</b> para abrir la cámara</li>
+          <li>El sistema detectará y reconocerá rostros automáticamente</li>
+          <li>Las detecciones aparecerán arriba en tiempo real</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    © 2025 ReconFace. Hecho para UNEMI.
+  </div>
+</div>
+
+<script>
+const videoUrl = "{% url 'video_feed' %}";
+const statusUrl = "{% url 'model_status' %}";
+let attendanceHistory = [];
+const MAX_HISTORY = 10;
+
+const img = document.getElementById('stream');
+const msg = document.getElementById('msg');
+const btnRecognize = document.getElementById('btn-recognize');
+const btnStop = document.getElementById('btn-stop');
+const btnSnapshot = document.getElementById('btn-snapshot');
+const attendanceList = document.getElementById('detection-list');
+const placeholder = document.querySelector('.stream-placeholder');
+
+let detectionsPollId = null;
+let attendanceRefreshId = null;
+
+function startDetectionsPolling() {
+  if (detectionsPollId) return;
+  detectionsPollId = setInterval(async () => {
+    try {
+      const res = await fetch('{% url "current_detections" %}');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.faces && data.faces.length > 0) {
+        updateAttendanceList(data.faces);
+      }
+    } catch (e) {
+      // Silenciar errores de polling
+    }
+  }, 800);
+}
+
+function stopDetectionsPolling() {
+  if (detectionsPollId) {
+    clearInterval(detectionsPollId);
+    detectionsPollId = null;
+  }
+}
+
+async function loadAttendanceToday() {
+  try {
+    const res = await fetch('{% url "attendance_today" %}');
+    if (!res.ok) return;
+    const data = await res.json();
+    const items = data.attendance || [];
+    // Limpiar lista actual
+    attendanceList.innerHTML = '';
+    attendanceHistory = [];
+    // items are ordered by first_seen asc; show newest first
+    items.slice().reverse().forEach(entry => {
+      const name = entry.name;
+      const time = new Date(entry.last_seen);
+      attendanceHistory.unshift({ name, timestamp: time });
+      const item = document.createElement('li');
+      item.className = 'detection-item';
+      item.innerHTML = `
+        <div>
+          <strong>${name}</strong>
+        </div>
+        <div class="attendance-time">
+          ${time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+        </div>
+      `;
+      attendanceList.appendChild(item);
+    });
+  } catch (e) {
+    // ignore
+  }
+}
+
+function updateAttendanceList(faces) {
+  if (!faces || faces.length === 0) return;
+
+  const now = new Date();
+  faces.forEach(face => {
+    // Verificar si la persona ya está en el historial
+    const alreadyRegistered = attendanceHistory.some(d => 
+      d.name === face.name && 
+      (now - d.timestamp) < 3600000 // No registrar la misma persona en 1 hora
+    );
+
+    if (!alreadyRegistered) {
+      attendanceHistory.unshift({
+        name: face.name,
+        timestamp: now
+      });
+
+      // Actualizar la lista en la UI
+      const item = document.createElement('li');
+      item.className = 'detection-item';
+      item.innerHTML = `
+        <div>
+          <strong>${face.name}</strong>
+        </div>
+        <div class="attendance-time">
+          ${now.toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
+        </div>
+      `;
+      if (attendanceList.firstChild) {
+        attendanceList.insertBefore(item, attendanceList.firstChild);
+      } else {
+        attendanceList.appendChild(item);
+      }
+
+      // Mantener solo los últimos MAX_HISTORY registros
+      if (attendanceList.children.length > MAX_HISTORY) {
+        attendanceList.removeChild(attendanceList.lastChild);
+      }
+    }
+  });
+}
+
+async function checkModelAndCamera() {
+  try {
+    const [mres, cres] = await Promise.all([
+      fetch(statusUrl),
+      fetch("{% url 'camera_status' %}")
+    ]);
+    const mdata = await mres.json();
+    const cdata = await cres.json();
+
+    if (!mdata.model_exists) {
+      msg.textContent = 'Error: No se encontró el modelo LBPH. Verifica que el archivo modeloLBPHFace.xml existe.';
+      btnRecognize.disabled = true;
+      return false;
+    }
+    if (!cdata.camera_ok) {
+      msg.textContent = 'Error: La cámara no está disponible.';
+      btnRecognize.disabled = true;
+      return false;
+    }
+    msg.textContent = 'Todo listo. Pulsa "Iniciar Cámara".';
+    btnRecognize.disabled = false;
+    return true;
+  } catch (e) {
+    msg.textContent = 'Error comprobando el sistema.';
+    btnRecognize.disabled = true;
+    return false;
+  }
+}
+
+btnRecognize.addEventListener('click', async function () {
+  const ok = await checkModelAndCamera();
+  if (!ok) return;
+  
+  try {
+    // Prueba la cámara primero con un snapshot
+    const testRes = await fetch('{% url "snapshot" %}');
+    if (!testRes.ok) {
+      const error = await testRes.json();
+      msg.textContent = 'Error al iniciar cámara: ' + (error.error || 'No se pudo acceder a la cámara');
+      return;
+    }
+
+    // Si el snapshot funciona, inicia el stream
+    img.onerror = function() {
+      msg.textContent = 'Error: No se pudo iniciar el stream de video';
+      img.src = '';
+      btnRecognize.style.display = 'inline';
+      btnStop.style.display = 'none';
+    };
+
+    img.onload = function() {
+      msg.textContent = 'Stream iniciado correctamente';
+    };
+
+    img.src = videoUrl + '?t=' + new Date().getTime(); // Evita caché
+    btnRecognize.style.display = 'none';
+    btnStop.style.display = 'inline';
+    placeholder.style.display = 'none';
+    msg.textContent = 'Iniciando cámara...';
+    // Iniciar polling de detecciones en segundo plano
+    startDetectionsPolling();
+    // Cargar y refrescar la lista persistente de asistencias
+    loadAttendanceToday();
+    if (!attendanceRefreshId) attendanceRefreshId = setInterval(loadAttendanceToday, 15000);
+  } catch (e) {
+    msg.textContent = 'Error al iniciar la cámara: ' + e.message;
+  }
+});
+
+btnStop.addEventListener('click', function () {
+  img.src = '';
+  btnRecognize.style.display = 'inline';
+  btnStop.style.display = 'none';
+  placeholder.style.display = 'flex';
+  msg.textContent = 'Cámara detenida.';
+  stopDetectionsPolling();
+  if (attendanceRefreshId) { clearInterval(attendanceRefreshId); attendanceRefreshId = null; }
+});
+
+btnSnapshot.addEventListener('click', async function () {
+  if (!img.src) {
+    msg.textContent = 'Primero inicia la cámara';
+    return;
+  }
+
+  try {
+    msg.textContent = 'Registrando asistencia...';
+    const res = await fetch('{% url "snapshot" %}');
+    
+    if (!res.ok) {
+      const error = await res.json();
+      msg.textContent = 'Error: ' + (error.error || 'No se pudo procesar la imagen');
+      return;
+    }
+
+    const data = await res.json();
+    if (data.faces && data.faces.length > 0) {
+      updateAttendanceList(data.faces);
+      // Refrescar lista persistente en servidor
+      loadAttendanceToday();
+      msg.textContent = `Asistencia registrada: ${data.faces.map(f => f.name).join(', ')}`;
+    } else {
+      msg.textContent = 'No se detectó ningún rostro';
+    }
+  } catch (e) {
+    msg.textContent = 'Error al registrar asistencia: ' + e.message;
+  }
+});
+
+// Comprueba el estado del sistema al cargar la página
+checkModelAndCamera();
+</script>
+
+{% endblock %}

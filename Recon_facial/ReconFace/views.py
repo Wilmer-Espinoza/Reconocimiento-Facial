@@ -43,12 +43,12 @@ if os.path.exists(possible1):
     DATA_DIR = possible1
 else:
     DATA_DIR = possible2
-# Rutas de modelo: preferimos el modelo en la raíz del proyecto (pract) y mantenemos
-# una copia en MEDIA para compatibilidad con la app web.
+# Rutas de modelo: preferimos el modelo en la carpeta del proyecto Django (Recon_facial)
+# y mantenemos una copia en MEDIA para compatibilidad con la app web.
 MODEL_DIR = os.path.join(settings.MEDIA_ROOT, 'models')
 os.makedirs(MODEL_DIR, exist_ok=True)
 MEDIA_MODEL_PATH = os.path.join(MODEL_DIR, 'modeloLBPHFace.xml')   # copia para MEDIA
-ROOT_MODEL_PATH = r'C:\Users\usuario\Desktop\pract\modeloLBPHFace.xml'
+ROOT_MODEL_PATH = os.path.join(settings.BASE_DIR, 'modeloLBPHFace.xml')
 CASCADE = cv2.CascadeClassifier(HAAR_PATH)
 
 # Umbral de confianza para LBPH (menor = mejor). Usamos la misma lógica que ReconocimientoFacial.py

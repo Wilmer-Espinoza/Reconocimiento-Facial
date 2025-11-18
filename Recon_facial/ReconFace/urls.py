@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.home, name='home'),                             # página principal
+    path('', views.reconocimiento, name='reconocimiento'),                             # página principal
     path('reconocimiento/', views.reconocimiento, name='reconocimiento'),
     path('video_feed/', views.video_feed, name='video_feed'),      # stream MJPEG
     # no exponemos endpoints de captura/entrenamiento por UI (solicitado)

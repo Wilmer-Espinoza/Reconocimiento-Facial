@@ -1,7 +1,7 @@
 import cv2
 import os
 
-dataPath = 'C:\\Users\\Wilmer\\Documents\\Universidad\\Reconocimiento-Facial\\Recon_facial\\RECONOCIMIENTO_FACIAL\\DATA' #Cambia a la ruta donde hayas almacenado Data
+dataPath = os.path.join(os.getcwd(), 'Recon_facial', 'RECONOCIMIENTO_FACIAL', 'DATA') #Cambia a la ruta donde hayas almacenado Data
 imagePaths = os.listdir(dataPath)
 print('imagePaths=',imagePaths)
 
@@ -12,7 +12,7 @@ face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 # Leyendo el modelo
 #face_recognizer.read('modeloEigenFace.xml')
 #face_recognizer.read('modeloFisherFace.xml')
-face_recognizer.read(r'C:\Users\Wilmer\Documents\Universidad\Reconocimiento-Facial\modeloLBPHFace.xml')
+face_recognizer.read(os.path.join(os.getcwd(), 'Recon_facial', 'modeloLBPHFace.xml'))
 
 cap = cv2.VideoCapture(1)
 #cap = cv2.VideoCapture('Video.mp4')
